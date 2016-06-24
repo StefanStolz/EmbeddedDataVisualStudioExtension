@@ -5,6 +5,10 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmbeddedData", "EmbeddedData\EmbeddedData.csproj", "{B5190980-7313-4565-AF54-39B0607BE647}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "embeddeddata.logic", "embeddeddata.logic\embeddeddata.logic.csproj", "{09DD7183-62A5-4BAD-A04C-1233D8AD2C49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "embeddeddata.logic.tests", "embeddeddata.logic.tests\embeddeddata.logic.tests.csproj", "{C26DB7F1-C48E-4336-A702-89C2D43F68EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{B5190980-7313-4565-AF54-39B0607BE647}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5190980-7313-4565-AF54-39B0607BE647}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5190980-7313-4565-AF54-39B0607BE647}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09DD7183-62A5-4BAD-A04C-1233D8AD2C49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09DD7183-62A5-4BAD-A04C-1233D8AD2C49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09DD7183-62A5-4BAD-A04C-1233D8AD2C49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09DD7183-62A5-4BAD-A04C-1233D8AD2C49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C26DB7F1-C48E-4336-A702-89C2D43F68EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C26DB7F1-C48E-4336-A702-89C2D43F68EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C26DB7F1-C48E-4336-A702-89C2D43F68EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C26DB7F1-C48E-4336-A702-89C2D43F68EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
