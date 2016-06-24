@@ -1,31 +1,42 @@
-﻿using System;
+﻿#region File Header
+
+// The MIT License (MIT)
+// 
+// Copyright (c) 2016 Stefan Stolz
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+#endregion
+
+#region using directives
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+#endregion
 
 namespace embeddeddata.logic
 {
     public class CodeGenerator
     {
-        private readonly string inputFilePath;
-        private readonly string targetNamespace;
-
-        public CodeGenerator(string inputFilePath, string targetNamespace)
-        {
-            if (targetNamespace == null) throw new ArgumentNullException(nameof(targetNamespace));
-            if (string.IsNullOrWhiteSpace(inputFilePath))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(inputFilePath));
-
-            this.inputFilePath = inputFilePath;
-            this.targetNamespace = targetNamespace;
-        }
-
-        private static readonly List<char> validClassNameCharacters = new List<char>
-            (
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_"
-            );
-
-
         private const string CodeForAsFile = @"        
     public static void AsFile([NotNull] Action<string> workWithFile)
     {
@@ -69,7 +80,6 @@ namespace embeddeddata.logic
         return Encoding.UTF8.GetString(AsBytes());
     }";
 
-
         private const string CodeForCopyTo = @"
     public static string CopyTo(string workingDirectory)
     {
@@ -89,10 +99,21 @@ namespace embeddeddata.logic
         return fullPath;
     }";
 
-        public void xxx(string workingDirectory)
+        private static readonly List<char> validClassNameCharacters = new List<char>
+            (
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_"
+            );
+        private readonly string inputFilePath;
+        private readonly string targetNamespace;
+
+        public CodeGenerator(string inputFilePath, string targetNamespace)
         {
-            if (workingDirectory == null) throw new ArgumentNullException(nameof(workingDirectory));
-            if (!Directory.Exists(workingDirectory)) throw new DirectoryNotFoundException("OutputDirectory for Resource Data not found");
+            if (targetNamespace == null) throw new ArgumentNullException(nameof(targetNamespace));
+            if (string.IsNullOrWhiteSpace(inputFilePath))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(inputFilePath));
+
+            this.inputFilePath = inputFilePath;
+            this.targetNamespace = targetNamespace;
         }
 
         public string Generate()
@@ -130,7 +151,7 @@ namespace embeddeddata.logic
                         innerClassNames.Add(Path.GetFileNameWithoutExtension(this.inputFilePath));
 
                         var blocks = new List<IDisposable>();
-                        
+
                         foreach (var innerClassName in innerClassNames)
                         {
                             writer.WriteLine("public static partial class {0}", GenerateSafeClassName(innerClassName));
@@ -157,6 +178,47 @@ namespace embeddeddata.logic
             return writer.ToString();
         }
 
+        internal static string GenerateSafeClassName(string inputFilePath)
+        {
+            var nameWithoutExtension = Path.GetFileNameWithoutExtension(inputFilePath);
+
+            if (string.IsNullOrWhiteSpace(nameWithoutExtension))
+                throw new InvalidOperationException($@"Der Pfad ""{inputFilePath}"" ist ungültig.");
+
+            if (nameWithoutExtension.Contains('+'))
+            {
+                nameWithoutExtension = nameWithoutExtension.Replace("+", "Plus").Replace("-", "Minus");
+            }
+
+            if (char.IsNumber(nameWithoutExtension[0]))
+            {
+                nameWithoutExtension = "_" + nameWithoutExtension;
+            }
+
+            return new string(nameWithoutExtension.Where(c => validClassNameCharacters.Contains(c)).ToArray());
+        }
+
+        private void WriteCode(CodeTextWriter writer, string name)
+        {
+            var resourcePath = this.targetNamespace + "." + name;
+
+            writer.WriteLine($"public const string FileName =\"{name}\";");
+            writer.WriteLine($"public const string ResourceName = \"{resourcePath}\";").WriteLine();
+
+            writer.WriteLine("public static Stream Open()");
+            using (writer.WriteBlock())
+            {
+                string code = $"return Assembly.GetExecutingAssembly().GetManifestResourceStream(\"{resourcePath}\");";
+
+                writer.WriteLine(code);
+            }
+
+            writer.WriteLine(CodeForAsFile);
+            writer.WriteLine(CodeForAsBytes);
+            writer.WriteLine(CodeForAsString);
+            writer.WriteLine(CodeForCopyTo);
+        }
+
         private void WriteNonTestDataCode(CodeTextWriter writer, string safeName, string name)
         {
             writer.WriteLine($"namespace {this.targetNamespace}");
@@ -170,45 +232,10 @@ namespace embeddeddata.logic
             }
         }
 
-        private void WriteCode(CodeTextWriter writer, string name)
+        public void xxx(string workingDirectory)
         {
-            var resourcePath = this.targetNamespace + "." + name;
-
-            writer.WriteLine($"public const string FileName =\"{name}\";");
-            writer.WriteLine($"public const string ResourceName = \"{resourcePath}\";").WriteLine();
-            
-
-            writer.WriteLine("public static Stream Open()");
-            using (writer.WriteBlock())
-            {
-                string code = $"return Assembly.GetExecutingAssembly().GetManifestResourceStream(\"{resourcePath}\");";
-                
-                writer.WriteLine(code);
-            }
-
-            writer.WriteLine(CodeForAsFile);
-            writer.WriteLine(CodeForAsBytes);
-            writer.WriteLine(CodeForAsString);
-            writer.WriteLine(CodeForCopyTo);
-        }
-
-        internal static string GenerateSafeClassName(string inputFilePath)
-        {
-            var nameWithoutExtension = Path.GetFileNameWithoutExtension(inputFilePath);
-
-            if (string.IsNullOrWhiteSpace(nameWithoutExtension)) throw new InvalidOperationException($@"Der Pfad ""{inputFilePath}"" ist ungültig.");
-
-            if (nameWithoutExtension.Contains('+'))
-            {
-                nameWithoutExtension = nameWithoutExtension.Replace("+", "Plus").Replace("-", "Minus");
-            }
-
-            if (char.IsNumber(nameWithoutExtension[0]))
-            {
-                nameWithoutExtension = "_" + nameWithoutExtension;
-            }
-
-            return new string(nameWithoutExtension.Where(c => validClassNameCharacters.Contains(c)).ToArray());
+            if (workingDirectory == null) throw new ArgumentNullException(nameof(workingDirectory));
+            if (!Directory.Exists(workingDirectory)) throw new DirectoryNotFoundException("OutputDirectory for Resource Data not found");
         }
     }
 }

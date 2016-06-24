@@ -1,8 +1,5 @@
 ﻿using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -11,17 +8,19 @@ using Microsoft.VisualStudio.Designer.Interfaces;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+
 using VSLangProj80;
+
 using EmbeddedTestDataCodeGenerator = embeddeddata.logic.CodeGenerator;
 using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace AWINSoftware.testdatapackagebuilder
+namespace EmbeddedData
 {
     [ComVisible(true)]
     [Guid("3742A3C2-2C1D-435E-9A96-8BCF2D9FD5A5")]
     [ProvideObject(typeof(EmbeddedTestData))]
-    [CodeGeneratorRegistration(typeof(EmbeddedTestData), "EmbeddedTestData", vsContextGuids.vsContextGuidVCSProject, GeneratesDesignTimeSource = true)]
-    [CodeGeneratorRegistration(typeof(EmbeddedTestData), "EmbeddedTestData", vsContextGuids.vsContextGuidVBProject, GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(EmbeddedTestData), "EmbeddedData", vsContextGuids.vsContextGuidVCSProject, GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(EmbeddedTestData), "EmbeddedData", vsContextGuids.vsContextGuidVBProject, GeneratesDesignTimeSource = true)]
     public class EmbeddedTestData : IVsSingleFileGenerator, IObjectWithSite
     {
 
@@ -33,13 +32,13 @@ namespace AWINSoftware.testdatapackagebuilder
         {
             get
             {
-                if (codeDomProvider == null)
+                if (this.codeDomProvider == null)
                 {
-                    IVSMDCodeDomProvider provider = (IVSMDCodeDomProvider)SiteServiceProvider.GetService(typeof(IVSMDCodeDomProvider).GUID);
+                    IVSMDCodeDomProvider provider = (IVSMDCodeDomProvider)this.SiteServiceProvider.GetService(typeof(IVSMDCodeDomProvider).GUID);
                     if (provider != null)
-                        codeDomProvider = (CodeDomProvider)provider.CodeDomProvider;
+                        this.codeDomProvider = (CodeDomProvider)provider.CodeDomProvider;
                 }
-                return codeDomProvider;
+                return this.codeDomProvider;
             }
         }
 
@@ -47,12 +46,12 @@ namespace AWINSoftware.testdatapackagebuilder
         {
             get
             {
-                if (serviceProvider == null)
+                if (this.serviceProvider == null)
                 {
-                    IServiceProvider oleServiceProvider = site as IServiceProvider;
-                    serviceProvider = new ServiceProvider(oleServiceProvider);
+                    IServiceProvider oleServiceProvider = this.site as IServiceProvider;
+                    this.serviceProvider = new ServiceProvider(oleServiceProvider);
                 }
-                return serviceProvider;
+                return this.serviceProvider;
             }
         }
 
@@ -60,7 +59,7 @@ namespace AWINSoftware.testdatapackagebuilder
 
         public int DefaultExtension(out string pbstrDefaultExtension)
         {
-            pbstrDefaultExtension = "." + CodeProvider.FileExtension;
+            pbstrDefaultExtension = "." + this.CodeProvider.FileExtension;
             return VSConstants.S_OK;
         }
 
@@ -95,11 +94,11 @@ namespace AWINSoftware.testdatapackagebuilder
 
         public void GetSite(ref Guid riid, out IntPtr ppvSite)
         {
-            if (site == null)
+            if (this.site == null)
                 Marshal.ThrowExceptionForHR(VSConstants.E_NOINTERFACE);
 
             // Query for the interface using the site object initially passed to the generator 
-            IntPtr punk = Marshal.GetIUnknownForObject(site);
+            IntPtr punk = Marshal.GetIUnknownForObject(this.site);
             int hr = Marshal.QueryInterface(punk, ref riid, out ppvSite);
             Marshal.Release(punk);
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hr);
@@ -108,11 +107,11 @@ namespace AWINSoftware.testdatapackagebuilder
         public void SetSite(object pUnkSite)
         {
             // Save away the site object for later use 
-            site = pUnkSite;
+            this.site = pUnkSite;
 
             // These are initialized on demand via our private CodeProvider and SiteServiceProvider properties 
-            codeDomProvider = null;
-            serviceProvider = null;
+            this.codeDomProvider = null;
+            this.serviceProvider = null;
         }
 
         #endregion IObjectWithSite
