@@ -1,4 +1,4 @@
-# EmbeddedData VisualStudio Extension
+# EmbeddedData Visual Studio Extension
 
 ## How to compile
 
