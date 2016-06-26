@@ -11,22 +11,26 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 using VSLangProj80;
 
-using EmbeddedTestDataCodeGenerator = embeddeddata.logic.CodeGenerator;
+using EmbeddedDataCodeGenerator = embeddeddata.logic.CodeGenerator;
 using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace EmbeddedData
 {
     [ComVisible(true)]
-    [Guid("3742A3C2-2C1D-435E-9A96-8BCF2D9FD5A5")]
-    [ProvideObject(typeof(EmbeddedTestData))]
-    [CodeGeneratorRegistration(typeof(EmbeddedTestData), "EmbeddedData", vsContextGuids.vsContextGuidVCSProject, GeneratesDesignTimeSource = true)]
-    [CodeGeneratorRegistration(typeof(EmbeddedTestData), "EmbeddedData", vsContextGuids.vsContextGuidVBProject, GeneratesDesignTimeSource = true)]
-    public class EmbeddedTestData : IVsSingleFileGenerator, IObjectWithSite
+    [Guid("596C2D81-6D8A-4741-A658-833FD3F634BB")]
+    [ProvideObject(typeof(EmbeddedData))]
+    [CodeGeneratorRegistration(typeof(EmbeddedData), "EmbeddedData", vsContextGuids.vsContextGuidVCSProject, GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(EmbeddedData), "EmbeddedData", vsContextGuids.vsContextGuidVBProject, GeneratesDesignTimeSource = true)]
+    public class EmbeddedData : IVsSingleFileGenerator, IObjectWithSite
     {
-
         private object site = null;
         private CodeDomProvider codeDomProvider = null;
         private ServiceProvider serviceProvider = null;
+
+        public EmbeddedData()
+        {
+            
+        }
 
         private CodeDomProvider CodeProvider
         {
@@ -72,7 +76,7 @@ namespace EmbeddedData
             byte[] bytes;
             try
             {
-                var codeGenerator = new EmbeddedTestDataCodeGenerator(wszInputFilePath, wszDefaultNamespace);
+                var codeGenerator = new EmbeddedDataCodeGenerator(wszInputFilePath, wszDefaultNamespace);
 
                 bytes = Encoding.UTF8.GetBytes(codeGenerator.Generate());
             }
