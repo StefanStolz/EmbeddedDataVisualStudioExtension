@@ -41,23 +41,23 @@ namespace embeddeddata.logic.tests.processnamespace
         public void ExceptionIfNoTestDataInNamespace()
         {
             Assert.Throws<ArgumentException>(
-                () => { ProcessNamespace.GetBaseNamespace("notenbox.nbw7fileadapter.tests.SubFolder"); });
+                () => { ProcessNamespace.GetBaseNamespace("application.fileadapter.tests.SubFolder"); });
         }
 
         [Test]
         public void ItemInSubfolder()
         {
-            var result = ProcessNamespace.GetBaseNamespace("notenbox.nbw7fileadapter.tests.TestData.SubFolder");
+            var result = ProcessNamespace.GetBaseNamespace("application.fileadapter.tests.TestData.SubFolder");
 
-            Assert.That(result, Is.EqualTo("notenbox.nbw7fileadapter.tests.TestData"));
+            Assert.That(result, Is.EqualTo("application.fileadapter.tests.TestData"));
         }
 
         [Test]
         public void ItemInTestDataRoot()
         {
-            var result = ProcessNamespace.GetBaseNamespace("notenbox.nbw7fileadapter.tests.TestData");
+            var result = ProcessNamespace.GetBaseNamespace("application.fileadapter.tests.TestData");
 
-            Assert.That(result, Is.EqualTo("notenbox.nbw7fileadapter.tests.TestData"));
+            Assert.That(result, Is.EqualTo("application.fileadapter.tests.TestData"));
         }
     }
 }

@@ -40,7 +40,7 @@ namespace embeddeddata.logic.tests.processnamespace
         [Test]
         public void NoSubNamespaceIfNoTestDataInNamespace()
         {
-            const string Namespace = "notenbox.nbw7fileadapter.tests.SubFolder";
+            const string Namespace = "application.fileadapter.tests.SubFolder";
 
             var sut = new ProcessNamespace();
 
@@ -54,13 +54,13 @@ namespace embeddeddata.logic.tests.processnamespace
         [Test]
         public void WithSubNamespace()
         {
-            const string Namespace = "notenbox.nbw7fileadapter.tests.TestData.SubFolder";
+            const string Namespace = "application.fileadapter.tests.TestData.SubFolder";
 
             var sut = new ProcessNamespace();
 
             var result = sut.Execute(Namespace);
 
-            Assert.That(result.Namespace, Is.EqualTo("notenbox.nbw7fileadapter.tests.TestData"));
+            Assert.That(result.Namespace, Is.EqualTo("application.fileadapter.tests.TestData"));
             Assert.That(result.HasTestData, Is.True);
             Assert.That(result.SubNamespace, Is.EqualTo("SubFolder"));
         }
@@ -68,13 +68,13 @@ namespace embeddeddata.logic.tests.processnamespace
         [Test]
         public void WithTestDataAtTheEnd()
         {
-            const string Namespace = "notenbox.nbw7fileadapter.tests.TestData";
+            const string Namespace = "application.fileadapter.tests.TestData";
 
             var sut = new ProcessNamespace();
 
             var result = sut.Execute(Namespace);
 
-            Assert.That(result.Namespace, Is.EqualTo("notenbox.nbw7fileadapter.tests.TestData"));
+            Assert.That(result.Namespace, Is.EqualTo("application.fileadapter.tests.TestData"));
             Assert.That(result.HasTestData, Is.True);
             Assert.That(result.SubNamespace, Is.Empty);
         }

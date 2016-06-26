@@ -40,7 +40,7 @@ namespace embeddeddata.logic.tests.codegenerator
         [Test]
         public void GenerateForRealNbw()
         {
-            var result = CodeGenerator.GenerateSafeClassName(@"N:\Shibby\Real.nbw");
+            var result = CodeGenerator.GenerateSafeClassName(@"N:\Shibby\Real.txt");
 
             Assert.That(result, Is.EqualTo("Real"));
         }

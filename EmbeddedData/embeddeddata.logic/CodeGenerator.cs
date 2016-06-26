@@ -105,6 +105,7 @@ namespace embeddeddata.logic
             );
         private readonly string inputFilePath;
         private readonly string targetNamespace;
+        private readonly ProcessNamespace processNamespace;
 
         public CodeGenerator(string inputFilePath, string targetNamespace)
         {
@@ -114,6 +115,7 @@ namespace embeddeddata.logic
 
             this.inputFilePath = inputFilePath;
             this.targetNamespace = targetNamespace;
+            processNamespace = new ProcessNamespace();
         }
 
         public string Generate()
@@ -122,54 +124,19 @@ namespace embeddeddata.logic
 
             string name = Path.GetFileName(this.inputFilePath);
 
-            var safeName = GenerateSafeClassName(this.inputFilePath);
-
-            writer.WriteLine("using System;");
-            writer.WriteLine("using System.IO;");
-            writer.WriteLine("using System.Text;");
-            writer.WriteLine("using System.Reflection;");
-            writer.WriteLine("using JetBrains.Annotations;");
-            writer.WriteLine();
+            WriteUsings(writer);
 
             writer.WriteLine("#region Designer generated code").WriteLine();
 
-            var processNamespace = new ProcessNamespace();
-
-            var namespaceResult = processNamespace.Execute(this.targetNamespace);
+            var namespaceResult = this.processNamespace.Execute(this.targetNamespace);
 
             if (namespaceResult.HasTestData)
             {
-                writer.WriteLine($"namespace {namespaceResult.Namespace}");
-                using (writer.WriteBlock())
-                {
-                    writer.WriteLine("public static partial class Files");
-                    using (writer.WriteBlock())
-                    {
-                        var innerClassNames = new List<string>();
-                        var parts = namespaceResult.SubNamespace.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-                        innerClassNames.AddRange(parts);
-                        innerClassNames.Add(Path.GetFileNameWithoutExtension(this.inputFilePath));
-
-                        var blocks = new List<IDisposable>();
-
-                        foreach (var innerClassName in innerClassNames)
-                        {
-                            writer.WriteLine("public static partial class {0}", GenerateSafeClassName(innerClassName));
-
-                            blocks.Add(writer.WriteBlock());
-                        }
-
-                        this.WriteCode(writer, name);
-
-                        foreach (var disposable in blocks)
-                        {
-                            disposable.Dispose();
-                        }
-                    }
-                }
+                this.WriteTestDataCode(writer, namespaceResult, name);
             }
             else
             {
+                var safeName = GenerateSafeClassName(this.inputFilePath);
                 this.WriteNonTestDataCode(writer, safeName, name);
             }
 
@@ -178,12 +145,54 @@ namespace embeddeddata.logic
             return writer.ToString();
         }
 
+        private void WriteTestDataCode(CodeTextWriter writer, ProcessNamespaceResult namespaceResult, string name)
+        {
+            writer.WriteLine($"namespace {namespaceResult.Namespace}");
+            using (writer.WriteBlock())
+            {
+                writer.WriteLine("public static partial class Files");
+                using (writer.WriteBlock())
+                {
+                    var innerClassNames = new List<string>();
+                    var parts = namespaceResult.SubNamespace.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                    innerClassNames.AddRange(parts);
+                    innerClassNames.Add(Path.GetFileNameWithoutExtension(this.inputFilePath));
+
+                    var blocks = new List<IDisposable>();
+
+                    foreach (var innerClassName in innerClassNames)
+                    {
+                        writer.WriteLine("public static partial class {0}", GenerateSafeClassName(innerClassName));
+
+                        blocks.Add(writer.WriteBlock());
+                    }
+
+                    this.WriteCode(writer, name);
+
+                    foreach (var disposable in blocks)
+                    {
+                        disposable.Dispose();
+                    }
+                }
+            }
+        }
+
+        private static void WriteUsings(CodeTextWriter writer)
+        {
+            writer.WriteLine("using System;");
+            writer.WriteLine("using System.IO;");
+            writer.WriteLine("using System.Text;");
+            writer.WriteLine("using System.Reflection;");
+            writer.WriteLine("using JetBrains.Annotations;");
+            writer.WriteLine();
+        }
+
         internal static string GenerateSafeClassName(string inputFilePath)
         {
             var nameWithoutExtension = Path.GetFileNameWithoutExtension(inputFilePath);
 
             if (string.IsNullOrWhiteSpace(nameWithoutExtension))
-                throw new InvalidOperationException($@"Der Pfad ""{inputFilePath}"" ist ungültig.");
+                throw new InvalidOperationException($@"The Path ""{inputFilePath}"" is invalid.");
 
             if (nameWithoutExtension.Contains('+'))
             {
@@ -230,12 +239,6 @@ namespace embeddeddata.logic
                     this.WriteCode(writer, name);
                 }
             }
-        }
-
-        public void xxx(string workingDirectory)
-        {
-            if (workingDirectory == null) throw new ArgumentNullException(nameof(workingDirectory));
-            if (!Directory.Exists(workingDirectory)) throw new DirectoryNotFoundException("OutputDirectory for Resource Data not found");
         }
     }
 }
