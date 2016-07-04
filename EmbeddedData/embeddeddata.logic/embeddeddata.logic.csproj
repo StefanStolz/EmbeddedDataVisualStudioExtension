@@ -36,6 +36,10 @@
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,6 +54,10 @@
     <Compile Include="CodeGenerationParameters.cs" />
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="CodeTextWriter.cs" />
+    <Compile Include="configuration\Configuration.cs" />
+    <Compile Include="configuration\ConfigurationMerger.cs" />
+    <Compile Include="configuration\StoredConfiguration.cs" />
+    <Compile Include="configuration\ConfigurationReader.cs" />
     <Compile Include="MethodTextBuilder.cs" />
     <Compile Include="ProcessNamespace.cs" />
     <Compile Include="ProcessNamespaceResult.cs" />
@@ -58,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

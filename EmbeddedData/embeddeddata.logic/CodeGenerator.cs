@@ -31,6 +31,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using embeddeddata.logic.configuration;
+
 #endregion
 
 namespace embeddeddata.logic
@@ -54,9 +56,11 @@ namespace embeddeddata.logic
         {
             var writer = new CodeTextWriter("    ");
 
+            var configuration = this.ReadConfiguration();
+
             var parameters = new CodeGenerationParameters.Builder
             {
-                UseResharperAnnotations = true,
+                UseResharperAnnotations = configuration.UseResharperAnnotations,
             }.Build();
 
             string name = Path.GetFileName(this.inputFilePath);
@@ -66,6 +70,24 @@ namespace embeddeddata.logic
             classWriter.Execute(writer, name);
 
             return writer.ToString();
+        }
+
+        private Configuration ReadConfiguration()
+        {
+            var result = new Configuration { UseResharperAnnotations = true };
+
+            string configurationPath = Path.Combine(Path.GetDirectoryName(this.inputFilePath), "embeddeddata.config.json");
+
+            if (File.Exists(configurationPath))
+            {
+                var reader = new ConfigurationReader();
+                var configMerger = new ConfigurationMerger();
+
+                var storedConfiguration = reader.ReadFile(configurationPath);
+                configMerger.Apply(storedConfiguration, result);
+            }
+
+            return result;
         }
     }
 }
