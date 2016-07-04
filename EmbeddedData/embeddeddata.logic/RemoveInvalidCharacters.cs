@@ -28,46 +28,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 #endregion
 
 namespace embeddeddata.logic
 {
-    public class CodeGenerator
+    public class RemoveInvalidCharacters
     {
-        private readonly string inputFilePath;
-        private readonly string targetNamespace;
+        private static readonly List<char> validClassNameCharacters = new List<char>
+            (
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_"
+            );
 
-        public CodeGenerator(string inputFilePath, string targetNamespace)
+        public static string FromClassName(string input)
         {
-            if (targetNamespace == null) throw new ArgumentNullException(nameof(targetNamespace));
-            if (string.IsNullOrWhiteSpace(inputFilePath))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(inputFilePath));
-
-            this.inputFilePath = inputFilePath;
-            this.targetNamespace = targetNamespace;
+            return new string(input.Where(c => validClassNameCharacters.Contains(c)).ToArray());
         }
-
-        public string Generate()
-        {
-            var writer = new CodeTextWriter("    ");
-
-            var parameters = new CodeGenerationParameters.Builder
-            {
-                UseResharperAnnotations = true,
-            }.Build();
-
-            string name = Path.GetFileName(this.inputFilePath);
-
-            var classWriter = new ClassWriter(parameters, this.inputFilePath, this.targetNamespace);
-
-            classWriter.Execute(writer, name, parameters);
-
-            return writer.ToString();
-        }
-
-
     }
 }

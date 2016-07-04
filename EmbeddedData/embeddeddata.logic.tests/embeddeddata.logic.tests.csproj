@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="codegenerator\GenerateSafeClassNameTests.cs" />
     <Compile Include="CodeTextWriterTests.cs" />
+    <Compile Include="MethodTextBuilderTests.cs" />
     <Compile Include="processnamespace\ExecuteTests.cs" />
     <Compile Include="processnamespace\GetBaseNamespaceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

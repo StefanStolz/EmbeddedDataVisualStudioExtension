@@ -46,11 +46,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassWriter.cs" />
+    <Compile Include="CodeGenerationParameters.cs" />
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="CodeTextWriter.cs" />
+    <Compile Include="MethodTextBuilder.cs" />
     <Compile Include="ProcessNamespace.cs" />
     <Compile Include="ProcessNamespaceResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoveInvalidCharacters.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />

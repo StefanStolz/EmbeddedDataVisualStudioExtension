@@ -1,5 +1,4 @@
 ﻿#region File Header
-
 // The MIT License (MIT)
 // 
 // Copyright (c) 2016 Stefan Stolz
@@ -21,53 +20,26 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 #endregion
-
-#region using directives
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-#endregion
-
 namespace embeddeddata.logic
 {
-    public class CodeGenerator
+    public class CodeGenerationParameters
     {
-        private readonly string inputFilePath;
-        private readonly string targetNamespace;
-
-        public CodeGenerator(string inputFilePath, string targetNamespace)
+        public CodeGenerationParameters(Builder builder)
         {
-            if (targetNamespace == null) throw new ArgumentNullException(nameof(targetNamespace));
-            if (string.IsNullOrWhiteSpace(inputFilePath))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(inputFilePath));
-
-            this.inputFilePath = inputFilePath;
-            this.targetNamespace = targetNamespace;
+            this.UseResharperAnnotations = builder.UseResharperAnnotations;
         }
 
-        public string Generate()
-        {
-            var writer = new CodeTextWriter("    ");
+        public bool UseResharperAnnotations { get; }
 
-            var parameters = new CodeGenerationParameters.Builder
+        public class Builder
+        {
+            public bool UseResharperAnnotations { get; set; }
+
+            public CodeGenerationParameters Build()
             {
-                UseResharperAnnotations = true,
-            }.Build();
-
-            string name = Path.GetFileName(this.inputFilePath);
-
-            var classWriter = new ClassWriter(parameters, this.inputFilePath, this.targetNamespace);
-
-            classWriter.Execute(writer, name, parameters);
-
-            return writer.ToString();
+                return new CodeGenerationParameters(this);
+            }
         }
-
-
     }
 }
