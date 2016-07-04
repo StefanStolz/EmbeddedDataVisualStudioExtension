@@ -28,13 +28,19 @@ namespace embeddeddata.logic
         public CodeGenerationParameters(Builder builder)
         {
             this.UseResharperAnnotations = builder.UseResharperAnnotations;
+            this.ResharperAnnotationNamespace = builder.ResharperAnnotationNamespace;
+            this.ClassNameWithExtension = builder.ClassNameWithExtension;
         }
 
         public bool UseResharperAnnotations { get; }
+        public string ResharperAnnotationNamespace { get; }
+        public bool ClassNameWithExtension { get;  }
 
         public class Builder
         {
             public bool UseResharperAnnotations { get; set; }
+            public string ResharperAnnotationNamespace { get; set; }
+            public bool ClassNameWithExtension { get; set; }
 
             public CodeGenerationParameters Build()
             {

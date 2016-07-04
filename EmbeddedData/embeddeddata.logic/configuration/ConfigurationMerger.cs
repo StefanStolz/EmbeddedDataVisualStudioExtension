@@ -37,6 +37,16 @@ namespace embeddeddata.logic.configuration
             {
                 target.UseResharperAnnotations = source.UseResharperAnnotations.Value;
             }
+
+            if (source.ResharperAnnotationsNamespace != null)
+            {
+                target.ResharperAnnotationsNamespace = source.ResharperAnnotationsNamespace;
+            }
+
+            if (source.ClassNameWithExtension.HasValue)
+            {
+                target.ClassNameWithExtension = source.ClassNameWithExtension.Value;
+            }
         }
     }
 }

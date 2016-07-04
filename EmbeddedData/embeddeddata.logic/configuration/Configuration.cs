@@ -26,5 +26,7 @@ namespace embeddeddata.logic.configuration
     public class Configuration
     {
         public bool UseResharperAnnotations { get; set; }
+        public string ResharperAnnotationsNamespace { get; set; }
+        public bool ClassNameWithExtension { get; set; }
     }
 }

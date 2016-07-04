@@ -61,6 +61,8 @@ namespace embeddeddata.logic
             var parameters = new CodeGenerationParameters.Builder
             {
                 UseResharperAnnotations = configuration.UseResharperAnnotations,
+                ResharperAnnotationNamespace = configuration.ResharperAnnotationsNamespace,
+                ClassNameWithExtension = configuration.ClassNameWithExtension,
             }.Build();
 
             string name = Path.GetFileName(this.inputFilePath);
@@ -74,20 +76,56 @@ namespace embeddeddata.logic
 
         private Configuration ReadConfiguration()
         {
-            var result = new Configuration { UseResharperAnnotations = true };
+            var result = new Configuration { UseResharperAnnotations = false, ResharperAnnotationsNamespace = "JetBrains.Annotations" };
 
-            string configurationPath = Path.Combine(Path.GetDirectoryName(this.inputFilePath), "embeddeddata.config.json");
+            var paths = this.GeneratedConfigurationPaths();
 
+            ReadConfigurations(paths, result);
+
+            return result;
+        }
+
+        private static void ReadConfigurations(Stack<string> paths, Configuration result)
+        {
+            while (paths.Any())
+            {
+                var configurationPath = paths.Pop();
+
+                UpdateConfiguration(configurationPath, result);
+            }
+        }
+
+        private Stack<string> GeneratedConfigurationPaths()
+        {
+            var parts =
+                Path.GetDirectoryName(Path.GetFullPath(this.inputFilePath))
+                    .Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            var paths = new Stack<string>();
+
+            while (parts.Count > 0)
+            {
+                string path = string.Join(Path.DirectorySeparatorChar.ToString(), parts) + Path.DirectorySeparatorChar;
+
+                string configurationPath = Path.Combine(path, "embeddeddata.config.json");
+
+                paths.Push(configurationPath);
+
+                parts = parts.Take(parts.Count - 1).ToList();
+            }
+            return paths;
+        }
+
+        private static void UpdateConfiguration(string configurationPath, Configuration configuration)
+        {
             if (File.Exists(configurationPath))
             {
                 var reader = new ConfigurationReader();
                 var configMerger = new ConfigurationMerger();
 
                 var storedConfiguration = reader.ReadFile(configurationPath);
-                configMerger.Apply(storedConfiguration, result);
+                configMerger.Apply(storedConfiguration, configuration);
             }
-
-            return result;
         }
     }
 }

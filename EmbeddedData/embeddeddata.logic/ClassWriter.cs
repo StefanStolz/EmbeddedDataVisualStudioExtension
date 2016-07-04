@@ -52,6 +52,8 @@ namespace embeddeddata.logic
 
             writer.WriteLine("#region Designer generated code").WriteLine();
 
+            WriteCodeGeneratedConfiguration(writer);
+
             var namespaceResult = this.processNamespace.Execute(this.targetNamespace);
 
             if (namespaceResult.HasTestData)
@@ -60,11 +62,25 @@ namespace embeddeddata.logic
             }
             else
             {
-                var safeName = GenerateSafeClassName(this.inputFilePath);
+                var safeName = GenerateSafeClassName(this.inputFilePath, this.parameters.ClassNameWithExtension);
                 this.WriteNonTestDataCode(writer, safeName, name);
             }
 
             writer.WriteLine().WriteLine("#endregion");
+        }
+
+        private void WriteCodeGeneratedConfiguration(CodeTextWriter writer)
+        {
+            var props = this.parameters.GetType().GetProperties();
+
+            writer.WriteLine("// Effective Configuration");
+
+            foreach (var propertyInfo in props)
+            {
+                var value = propertyInfo.GetValue(this.parameters);
+
+                writer.WriteLine($"// {propertyInfo.Name}: {value}");
+            }
         }
 
         private void WriteTestDataCode(CodeTextWriter writer, ProcessNamespaceResult namespaceResult, string name)
@@ -78,13 +94,13 @@ namespace embeddeddata.logic
                     var innerClassNames = new List<string>();
                     var parts = namespaceResult.SubNamespace.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
                     innerClassNames.AddRange(parts);
-                    innerClassNames.Add(Path.GetFileNameWithoutExtension(this.inputFilePath));
+                    innerClassNames.Add(GenerateSafeClassName(this.inputFilePath, this.parameters.ClassNameWithExtension));
 
                     var blocks = new List<IDisposable>();
 
                     foreach (var innerClassName in innerClassNames)
                     {
-                        writer.WriteLine("public static partial class {0}", GenerateSafeClassName(innerClassName));
+                        writer.WriteLine("public static partial class {0}", innerClassName);
 
                         blocks.Add(writer.WriteBlock());
                     }
@@ -107,30 +123,51 @@ namespace embeddeddata.logic
             writer.WriteLine("using System.Reflection;");
             if (this.parameters.UseResharperAnnotations)
             {
-                writer.WriteLine("using JetBrains.Annotations;");
+                writer.WriteLine($"using {this.parameters.ResharperAnnotationNamespace};");
             }
 
             writer.WriteLine();
         }
 
-        internal static string GenerateSafeClassName(string inputFilePath)
+        internal static string GenerateSafeClassName(string inputFilePath, bool generateClassNameWithExtension)
         {
-            var nameWithoutExtension = Path.GetFileNameWithoutExtension(inputFilePath);
+            string name;
+            if (generateClassNameWithExtension)
+            {
+                var nameOfFile = Path.GetFileNameWithoutExtension(inputFilePath);
+                var extension = Path.GetExtension(inputFilePath).TrimStart('.');
 
-            if (string.IsNullOrWhiteSpace(nameWithoutExtension))
+                name = nameOfFile + UpperCaseFirstLetter(extension);
+            }
+            else
+            {
+                name = Path.GetFileNameWithoutExtension(inputFilePath);
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
                 throw new InvalidOperationException($@"The Path ""{inputFilePath}"" is invalid.");
 
-            if (nameWithoutExtension.Contains('+'))
+            if (name.Contains('+'))
             {
-                nameWithoutExtension = nameWithoutExtension.Replace("+", "Plus").Replace("-", "Minus");
+                name = name.Replace("+", "Plus").Replace("-", "Minus");
             }
 
-            if (char.IsNumber(nameWithoutExtension[0]))
+            if (char.IsNumber(name[0]))
             {
-                nameWithoutExtension = "_" + nameWithoutExtension;
+                name = "_" + name;
             }
 
-            return RemoveInvalidCharacters.FromClassName(nameWithoutExtension);
+            return RemoveInvalidCharacters.FromClassName(name);
+        }
+
+        private static string UpperCaseFirstLetter(string text)
+        {
+            if (text.Length > 1)
+            {
+                return char.ToUpper(text[0]) + text.Substring(1);
+            }
+            
+            return text;
         }
 
         private void WriteCode(CodeTextWriter writer, string name)
@@ -154,7 +191,7 @@ namespace embeddeddata.logic
                 writer.WriteLine("[NotNull]");
                 writer.WriteLine("[Pure]");
             }
-            
+
             var builder = MethodTextBuilder.Create("CopyTo").SetVisibility(MethodVisibility.Public).SetStatic().SetReturnType("string");
             var parameterDefinition = builder.BeginParameter();
             parameterDefinition.SetName("destinationDirectory").SetType("string");

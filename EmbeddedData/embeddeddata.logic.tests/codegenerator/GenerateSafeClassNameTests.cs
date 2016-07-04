@@ -38,9 +38,25 @@ namespace embeddeddata.logic.tests.codegenerator
     public sealed class GenerateSafeClassNameTests
     {
         [Test]
-        public void GenerateForRealNbw()
+        public void GenerateForRealTxtWithoutExtension()
         {
-            var result = ClassWriter.GenerateSafeClassName(@"N:\Shibby\Real.txt");
+            var result = ClassWriter.GenerateSafeClassName(@"N:\Shibby\Real.txt", false);
+
+            Assert.That(result, Is.EqualTo("Real"));
+        }
+
+        [Test]
+        public void GenerateForRealTxtWithExtension()
+        {
+            var result = ClassWriter.GenerateSafeClassName(@"N:\Shibby\Real.txt", true);
+
+            Assert.That(result, Is.EqualTo("RealTxt"));
+        }
+
+        [Test]
+        public void GeneratedForFileNameWithoutExtension()
+        {
+            var result = ClassWriter.GenerateSafeClassName(@"N:\Shibby\Real", true);
 
             Assert.That(result, Is.EqualTo("Real"));
         }
