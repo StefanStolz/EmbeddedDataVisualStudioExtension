@@ -40,6 +40,8 @@ namespace embeddeddata.logic
         private readonly string methodName;
         private string returnType = "void";
         private readonly List<ParameterDefinition> parameters = new List<ParameterDefinition>();
+        private bool isStatic;
+        private MethodVisibility methodVisibility;
 
         private MethodTextBuilder(string methodName)
         {
@@ -67,13 +69,36 @@ namespace embeddeddata.logic
         {
             var sb = new StringBuilder();
 
+            this.AppendMethodVisibility(sb);
+            if (this.isStatic)
+            {
+                sb.Append("static ");
+            }
             sb.Append($"{this.returnType} {this.methodName}");
             sb.Append("(");
             sb.Append(string.Join(", ", this.parameters));
             sb.Append(")");
 
-
             target.WriteLine(sb.ToString());
+        }
+
+        private void AppendMethodVisibility(StringBuilder sb)
+        {
+            switch (this.methodVisibility)
+            {
+                case MethodVisibility.Private:
+                    sb.Append("private ");
+                    break;
+                case MethodVisibility.Protected:
+                    sb.Append("protected ");
+                    break;
+                case MethodVisibility.Internal:
+                    sb.Append("internal ");
+                    break;
+                case MethodVisibility.Public:
+                    sb.Append("public ");
+                    break;
+            }
         }
 
         public void WriteTo(StringBuilder targetStringBuilder)
@@ -190,5 +215,27 @@ namespace embeddeddata.logic
 
             return this;
         }
+
+        public MethodTextBuilder SetStatic(bool isStatic = true)
+        {
+            this.isStatic = isStatic;
+
+            return this;
+        }
+
+        public MethodTextBuilder SetVisibility(MethodVisibility methodVisibility)
+        {
+            this.methodVisibility = methodVisibility;
+
+            return this;
+        }
+    }
+
+    public enum MethodVisibility
+    {
+        Private,
+        Protected,
+        Internal,
+        Public,
     }
 }

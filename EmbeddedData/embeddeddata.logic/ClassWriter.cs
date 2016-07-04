@@ -46,7 +46,7 @@ namespace embeddeddata.logic
             this.targetNamespace = targetNamespace;
         }
 
-        public void Execute(CodeTextWriter writer, string name, CodeGenerationParameters parameters)
+        public void Execute(CodeTextWriter writer, string name)
         {
             WriteUsings(writer);
 
@@ -109,7 +109,7 @@ namespace embeddeddata.logic
             {
                 writer.WriteLine("using JetBrains.Annotations;");
             }
-            
+
             writer.WriteLine();
         }
 
@@ -149,12 +149,22 @@ namespace embeddeddata.logic
 
         private void WriteCopyTo(CodeTextWriter writer)
         {
-            if(this.parameters.UseResharperAnnotations)
+            if (this.parameters.UseResharperAnnotations)
             {
                 writer.WriteLine("[NotNull]");
                 writer.WriteLine("[Pure]");
             }
-            writer.WriteLine("public static string CopyTo([NotNull] string destinationDirectory)");
+            
+            var builder = MethodTextBuilder.Create("CopyTo").SetVisibility(MethodVisibility.Public).SetStatic().SetReturnType("string");
+            var parameterDefinition = builder.BeginParameter();
+            parameterDefinition.SetName("destinationDirectory").SetType("string");
+            if (this.parameters.UseResharperAnnotations)
+            {
+                parameterDefinition.AddAttribute("NotNull");
+            }
+            parameterDefinition.Finish();
+
+            builder.WriteTo(writer);
             using (writer.WriteBlock())
             {
                 writer.WriteLine("if (destinationDirectory == null) throw new ArgumentNullException(nameof(destinationDirectory));");
@@ -190,7 +200,7 @@ namespace embeddeddata.logic
             }
         }
 
-        private  void WriteAsBytes(CodeTextWriter writer)
+        private void WriteAsBytes(CodeTextWriter writer)
         {
             if (this.parameters.UseResharperAnnotations)
             {
@@ -221,7 +231,25 @@ namespace embeddeddata.logic
                 writer.WriteLine("[NotNull]");
                 writer.WriteLine("[Pure]");
             }
-            writer.WriteLine("public static void AsFile([NotNull][InstantHandle] Action<string> workWithFile)");
+
+            var builder = MethodTextBuilder.Create("AsFile")
+                .SetVisibility(MethodVisibility.Public)
+                .SetStatic();
+
+            var parameterDefinition = builder.BeginParameter();
+
+            if (this.parameters.UseResharperAnnotations)
+            {
+                parameterDefinition.AddAttribute("NotNull")
+                    .AddAttribute("InstantHandle");
+            }
+
+            parameterDefinition.SetType("Action<string>")
+                .SetName("workWithFile")
+                .Finish();
+
+            builder.WriteTo(writer);
+
             using (writer.WriteBlock())
             {
                 writer.WriteLine("if (workWithFile == null) throw new ArgumentNullException(nameof(workWithFile));");
@@ -256,7 +284,8 @@ namespace embeddeddata.logic
                 writer.WriteLine("[NotNull]");
                 writer.WriteLine("[Pure]");
             }
-            writer.WriteLine("public static Stream Open()");
+
+            MethodTextBuilder.Create("Open").SetReturnType("Stream").SetStatic().SetVisibility(MethodVisibility.Public).WriteTo(writer);
             using (writer.WriteBlock())
             {
                 string code = $"return Assembly.GetExecutingAssembly().GetManifestResourceStream(\"{resourcePath}\");";

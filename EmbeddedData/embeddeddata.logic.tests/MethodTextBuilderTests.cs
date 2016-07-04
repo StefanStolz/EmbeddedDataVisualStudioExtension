@@ -15,7 +15,7 @@ namespace embeddeddata.logic.tests
 
             var result = sut.ToString();
 
-            Assert.That(result, Is.EqualTo("void Simple()"));
+            Assert.That(result, Is.EqualTo("private void Simple()"));
         }
 
         [Test]
@@ -26,7 +26,7 @@ namespace embeddeddata.logic.tests
 
             var result = sut.ToString();
 
-            Assert.That(result, Is.EqualTo("void Simple(string parameter)"));
+            Assert.That(result, Is.EqualTo("private void Simple(string parameter)"));
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace embeddeddata.logic.tests
                 .AddParameter("int", "value")
                 .ToString();
 
-            Assert.That(result, Is.EqualTo("void Simple(string parameter, int value)"));
+            Assert.That(result, Is.EqualTo("private void Simple(string parameter, int value)"));
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace embeddeddata.logic.tests
 
             var result = sut.ToString();
 
-            Assert.That(result, Is.EqualTo("void Shibby([NotNull] string parameter)"));
+            Assert.That(result, Is.EqualTo("private void Shibby([NotNull] string parameter)"));
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace embeddeddata.logic.tests
 
             var result = sut.ToString();
 
-            Assert.That(result, Is.EqualTo("int Gulu([NotNull] string parameter, int value)"));
+            Assert.That(result, Is.EqualTo("private int Gulu([NotNull] string parameter, int value)"));
         }
 
         [Test]
@@ -83,7 +83,28 @@ namespace embeddeddata.logic.tests
 
             var result = sut.ToString();
 
-            Assert.That(result, Is.EqualTo("int Simple()"));
+            Assert.That(result, Is.EqualTo("private int Simple()"));
+        }
+
+        [Test]
+        public void WriteStaticMethodThatReturnsAnInteger()
+        {
+            var sut = MethodTextBuilder.Create("Simple")
+                .SetReturnType("int").SetStatic();
+
+            var result = sut.ToString();
+
+            Assert.That(result, Is.EqualTo("private static int Simple()"));
+        }
+
+        [Test]
+        public void WriteSimplePublicMethod()
+        {
+            var sut = MethodTextBuilder.Create("Simple").SetVisibility(MethodVisibility.Public);
+
+            var result = sut.ToString();
+
+            Assert.That(result, Is.EqualTo("public void Simple()"));
         }
 
         [Test]
@@ -99,7 +120,7 @@ namespace embeddeddata.logic.tests
             var result = cw.ToString();
 
             Assert.That(result, Is.EqualTo(@"{
-  void Simple()
+  private void Simple()
 }
 "));
         }

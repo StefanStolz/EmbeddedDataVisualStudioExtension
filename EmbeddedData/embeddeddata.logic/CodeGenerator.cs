@@ -63,11 +63,9 @@ namespace embeddeddata.logic
 
             var classWriter = new ClassWriter(parameters, this.inputFilePath, this.targetNamespace);
 
-            classWriter.Execute(writer, name, parameters);
+            classWriter.Execute(writer, name);
 
             return writer.ToString();
         }
-
-
     }
 }
