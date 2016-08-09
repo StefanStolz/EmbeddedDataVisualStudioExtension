@@ -182,6 +182,69 @@ namespace embeddeddata.logic
             WriteAsBytes(writer);
             WriteAsString(writer);
             WriteCopyTo(writer);
+            WriteFileHandle(writer);
+        }
+
+        private void WriteFileHandle(CodeTextWriter writer)
+        {
+            writer.WriteLine("public static FileHandle OpenFile()");
+            using (writer.WriteBlock())
+            {
+                writer.WriteLine("var tempFileName = Path.GetTempFileName();");
+                writer.WriteLine("using (var destination = File.OpenWrite(tempFileName))");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("using (var source = Open())");
+                    using (writer.WriteBlock())
+                    {
+                        writer.WriteLine("source.CopyTo(destination);");
+                    }
+                }
+
+                writer.WriteLine("return new FileHandle(tempFileName);");
+            }
+
+            writer.WriteLine("public class FileHandle : IDisposable");
+            using (writer.WriteBlock())
+            {
+                writer.WriteLine("private bool disposed;");
+                writer.WriteLine("public FileHandle(string path)");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("this.Path = path;");
+                }
+
+                writer.WriteLine("public string Path { get; }");
+
+                writer.WriteLine("public void Delete()");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("File.Delete(this.Path);");
+                }
+
+                writer.WriteLine("private void Dispose(bool disposing)");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("if(!this.disposed)");
+                    using (writer.WriteBlock())
+                    {
+                        writer.WriteLine("if(disposing)");
+                        using (writer.WriteBlock())
+                        {
+                            writer.WriteLine("File.Delete(this.Path);");
+                        }
+
+                        writer.WriteLine("this.disposed = true;");
+                    }
+                }
+
+                writer.WriteLine("public void Dispose()");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("GC.SuppressFinalize(this);");
+                    writer.WriteLine("this.Dispose(true);");
+                }
+            }
         }
 
         private void WriteCopyTo(CodeTextWriter writer)
