@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="34acbd59-367a-48da-936d-c921aa8d3220" Version="1.0.5" Language="en-US" Publisher="Stefan Stolz" />
+    <Identity Id="34acbd59-367a-48da-936d-c921aa8d3220" Version="1.1.0" Language="en-US" Publisher="Stefan Stolz" />
     <DisplayName>EmbeddedData</DisplayName>
     <Description xml:space="preserve">Creates Helper-Classes for EmbeddedResources</Description>
     <MoreInfo>https://github.com/StefanStolz/EmbeddedDataVisualStudioExtension</MoreInfo>
@@ -17,4 +17,7 @@
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
   </Assets>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.26208.0,16.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
 </PackageManifest>
