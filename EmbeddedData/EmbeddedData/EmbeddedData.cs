@@ -36,6 +36,8 @@ namespace EmbeddedData
         {
             get
             {
+                ThreadHelper.ThrowIfNotOnUIThread();
+
                 if (this.codeDomProvider == null)
                 {
                     IVSMDCodeDomProvider provider = (IVSMDCodeDomProvider)this.SiteServiceProvider.GetService(typeof(IVSMDCodeDomProvider).GUID);
@@ -50,6 +52,8 @@ namespace EmbeddedData
         {
             get
             {
+                ThreadHelper.ThrowIfNotOnUIThread();
+
                 if (this.serviceProvider == null)
                 {
                     IServiceProvider oleServiceProvider = this.site as IServiceProvider;
@@ -63,6 +67,8 @@ namespace EmbeddedData
 
         public int DefaultExtension(out string pbstrDefaultExtension)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             pbstrDefaultExtension = "." + this.CodeProvider.FileExtension;
             return VSConstants.S_OK;
         }

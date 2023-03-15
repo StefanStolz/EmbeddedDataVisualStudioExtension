@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="34acbd59-367a-48da-936d-c921aa8d3220" Version="1.4.0" Language="en-US" Publisher="Stefan Stolz" />
+        <Identity Id="34acbd59-367a-48da-936d-c921aa8d3220" Version="1.4.3" Language="en-US" Publisher="Stefan Stolz" />
         <DisplayName>EmbeddedData</DisplayName>
         <Description xml:space="preserve">Creates Helper-Classes for EmbeddedResources</Description>
         <MoreInfo>https://github.com/StefanStolz/EmbeddedDataVisualStudioExtension</MoreInfo>
@@ -14,15 +14,30 @@
         <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Community">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
+        <InstallationTarget Version="[15.0,17.0)" Id="Microsoft.VisualStudio.Pro">
+            <ProductArchitecture>x86</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[15.0,17.0)" Id="Microsoft.VisualStudio.Enterprise">
+            <ProductArchitecture>x86</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Pro">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Enterprise">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Community">
+            <ProductArchitecture>arm64</ProductArchitecture>
+        </InstallationTarget>
     </Installation>
     <Dependencies>
-        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5.2,)" />
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.8.0,)" />
         <Dependency d:Source="Installed" Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" Version="[14.0,17.0)" />
     </Dependencies>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
     </Assets>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.26208.0,17.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.26208.0,18.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
 </PackageManifest>
